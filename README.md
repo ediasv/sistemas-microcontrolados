@@ -1,10 +1,11 @@
 # Sistemas Microcontrolados — ELEW31
 
-Repositório centralizador de tudo o que diz respeito à disciplina **Sistemas Microcontrolados (ELEW31)** do curso de Engenharia Eletrônica da UTFPR (Campus Curitiba), ministrada pelo Prof. Guilherme de Santi Peron. Aqui ficam reunidos:
+Repositório centralizador de tudo o que diz respeito à disciplina **Sistemas Microcontrolados (ELEW31)** do curso de Engenharia de Computação da UTFPR (Campus Curitiba), ministrada pelo Prof. Guilherme de Santi Peron. Aqui ficam reunidos:
 
 - **Anotações e materiais das aulas** (slides em PDF);
 - **Enunciados** dos laboratórios e atividades práticas;
 - **Datasheet** do microcontrolador utilizado;
+- **Material Extra** fornecido pelo professor, como material de referência de linguagem assembly.
 - **Projetos desenvolvidos** (código Assembly e C, fluxogramas e arquivos de projeto Keil).
 
 ## Conteúdo da disciplina
