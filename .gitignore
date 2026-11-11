@@ -15,3 +15,5 @@ Objects
 !*.ini
 !*.uvprojx
 !.gitignore
+
+.DS_Store
