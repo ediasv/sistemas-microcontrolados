@@ -229,19 +229,19 @@ Reset_Handler
         ; Note that this does not use DriverLib since it might not be included
         ; in this project.
         ;
-;        MOVW    R0, #0xED88
-;        MOVT    R0, #0xE000
-;        LDR     R1, [R0]
-;        ORR     R1, #0x00F00000
-;        STR     R1, [R0]
+        MOVW    R0, #0xED88
+        MOVT    R0, #0xE000
+        LDR     R1, [R0]
+        ORR     R1, #0x00F00000
+        STR     R1, [R0]
 
         ;
         ; Call the C library enty point that handles startup.  This will copy
         ; the .data section initializers from flash to SRAM and zero fill the
         ; .bss section.
         ;
-        IMPORT  Start
-        B       Start     ;call user assembly language program
+        IMPORT  __main
+        B       __main     ;call user main C function
 
 ;******************************************************************************
 ;
@@ -569,6 +569,28 @@ WaitForInterrupt
         WFI
         BX     LR
 
+;******************************************************************************
+;
+; The function expected of the C library startup code for defining the stack
+; and heap memory locations.  For the C library version of the startup code,
+; provide this function so that the C library initialization code can find out
+; the location of the stack and heap.
+;
+;******************************************************************************
+    IF :DEF: __MICROLIB
+        EXPORT  __initial_sp
+        EXPORT  __heap_base
+        EXPORT  __heap_limit
+    ELSE
+        IMPORT  __use_two_region_memory
+        EXPORT  __user_initial_stackheap
+__user_initial_stackheap
+        LDR     R0, =HeapMem
+        LDR     R1, =(StackMem + Stack)
+        LDR     R2, =(HeapMem + Heap)
+        LDR     R3, =StackMem
+        BX      LR
+    ENDIF
 
 
 ;******************************************************************************
