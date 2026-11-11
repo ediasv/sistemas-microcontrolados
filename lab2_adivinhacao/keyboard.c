@@ -7,12 +7,16 @@ void SysTick_Wait1us(uint32_t delay);
 
 #define DEBOUNCE_MS 150   //Roteiro: atraso de 100-200ms apos identificar a tecla
 
-//Definicao do mapeamento do teclado
+//Mapeamento do teclado: teclado_map[PL][PM]
+//Na placa o conector do teclado esta invertido (pinos 1..8 = C4..C1, L4..L1):
+//PL0..PL3 recebem as colunas 4..1 e PM4..PM7 recebem as linhas 4..1.
+//Por isso cada linha desta tabela e uma coluna fisica do teclado, de baixo para cima.
 const char teclado_map[4][4] = {
-    {'1', '2', '3', 'A'},
-    {'4', '5', '6', 'B'},
-    {'7', '8', '9', 'C'},
-    {'*', '0', '#', 'D'}
+    /* PM4  PM5  PM6  PM7 */
+    {'D', 'C', 'B', 'A'},   //PL0 = coluna 4
+    {'#', '9', '6', '3'},   //PL1 = coluna 3
+    {'0', '8', '5', '2'},   //PL2 = coluna 2
+    {'*', '7', '4', '1'}    //PL3 = coluna 1
 };
 
 //Varredura do teclado: ativa uma coluna por vez (nivel baixo) e le as linhas.
