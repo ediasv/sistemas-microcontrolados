@@ -1,0 +1,34 @@
+stateDiagram-v2
+    direction TB
+
+    [*] --> AGUARDANDO : Inicializar hardware
+
+    AGUARDANDO --> DIGITANDO : Primeira tecla / sortear número e iniciar tempo
+
+    DIGITANDO --> MOSTRANDO_DICA : Tecla # e palpite errado / tentativas += 1
+    DIGITANDO --> ACERTOU : Tecla # e palpite certo / tentativas += 1, parar tempo
+
+    MOSTRANDO_DICA --> DIGITANDO : Dígito ou * / zerar palpite
+
+    DIGITANDO --> AGUARDANDO : Tecla A
+    MOSTRANDO_DICA --> AGUARDANDO : Tecla A
+    ACERTOU --> AGUARDANDO : Tecla A
+
+    AGUARDANDO : Aguardando
+    AGUARDANDO : LCD mostra 'Adivinhe 0-99'
+    DIGITANDO : Digitando
+    DIGITANDO : LCD mostra palpite e tentativas
+    DIGITANDO : Dígito compõe o palpite, * apaga o palpite
+    MOSTRANDO_DICA : Mostrando dica
+    MOSTRANDO_DICA : LCD mostra palpite e 'MAIOR' ou 'MENOR'
+    ACERTOU : Acertou
+    ACERTOU : LCD mostra número, tentativas e tempo
+
+    %% ================= ESTILO =================
+    classDef inicio fill:#c9dcf8,stroke:#333,stroke-width:2px,color:#000
+    classDef processo fill:#ffffff,stroke:#333,stroke-width:2px,color:#000
+    classDef fim fill:#f6c9a8,stroke:#333,stroke-width:2px,color:#000
+
+    class AGUARDANDO inicio
+    class DIGITANDO,MOSTRANDO_DICA processo
+    class ACERTOU fim
