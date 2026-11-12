@@ -1,7 +1,7 @@
 Listings
 Objects
 
-*.o 
+*.o
 *.axf
 *.htm
 *.lnp
@@ -20,3 +20,4 @@ Objects
 
 C_Exemplo/
 *.mmd
+*.zip
