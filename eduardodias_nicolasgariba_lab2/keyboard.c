@@ -19,26 +19,39 @@ const char teclado_map[4][4] = {
     {'*', '7', '4', '1'}    //PL3 = coluna 1
 };
 
-//Varredura do teclado: ativa uma coluna por vez (nivel baixo) e le as linhas.
+#define COLUNAS_MASK 0xF0 //PM4-PM7 (nunca mexer em PM0-PM2, usados pelo LCD)
+#define GUARDA_US    50   //Tempo de guarda apos trocar a coluna ativa
+
+//Volta PM4-PM7 para entrada (alta impedancia), sem alterar os demais bits.
+static void Colunas_AltaImpedancia(void) {
+    GPIO_PORTM_DIR_R &= ~COLUNAS_MASK;
+}
+
+//Varredura do teclado: ativa uma coluna por vez e le as linhas.
+//Coluna ativa = saida em nivel baixo; colunas inativas = entrada (alta impedancia).
+//Assim, duas teclas apertadas na mesma linha nunca ligam uma saida em 0 a uma saida em 1.
 //Retorna o caractere da tecla pressionada ou 0 se nenhuma tecla.
 uint8_t Teclado_Read(void) {
-    uint32_t colunas[4] = {0xEF, 0xDF, 0xBF, 0x7F};
+    const uint32_t colunas[4] = {0x10, 0x20, 0x40, 0x80};   //PM4, PM5, PM6, PM7
 
     for (int c = 0; c < 4; c++) {
-        GPIO_PORTM_DATA_R = (GPIO_PORTM_DATA_R & 0x0F) | (colunas[c] & 0xF0);
-        SysTick_Wait1us(20);
+        GPIO_PORTM_DATA_R &= ~colunas[c];                                      //a) coluna ativa em 0
+        GPIO_PORTM_DIR_R = (GPIO_PORTM_DIR_R & ~COLUNAS_MASK) | colunas[c];    //b) so ela como saida
+        SysTick_Wait1us(GUARDA_US);                                            //c) tempo de guarda
 
-        uint32_t lines = GPIO_PORTL_DATA_R & 0x0F;
+        uint32_t lines = GPIO_PORTL_DATA_R & 0x0F;                             //d) le PL0-PL3
 
         if (lines != 0x0F) {
             for (int l = 0; l < 4; l++) {
                 if (!(lines & (1 << l))) {
                     SysTick_Wait1ms(DEBOUNCE_MS);                //Debounce
                     while((GPIO_PORTL_DATA_R & 0x0F) != 0x0F);   //Trava ate soltar
+                    Colunas_AltaImpedancia();
                     return teclado_map[l][c];
                 }
             }
         }
     }
+    Colunas_AltaImpedancia();
     return 0;
 }
