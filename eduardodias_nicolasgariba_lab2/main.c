@@ -29,10 +29,10 @@ uint32_t Tempo_Segundos(void);
 //Fases do jogo
 typedef enum estJogo
 {
-	AGUARDANDO,     //tela inicial, espera a primeira tecla para sortear
-	DIGITANDO,      //compondo o palpite
-	MOSTRANDO_DICA, //palpite errado, mostrando MAIOR/MENOR
-	ACERTOU         //fim de jogo
+	AGUARDANDO,     //tela inicial
+	DIGITANDO,      //escrevendo o palpite
+	MOSTRANDO_DICA, //palpite errado
+	ACERTOU         //fim
 } estadosJogo;
 
 estadosJogo estados = AGUARDANDO;
