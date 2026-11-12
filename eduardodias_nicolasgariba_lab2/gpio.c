@@ -16,7 +16,7 @@ void GPIO_Init(void) {
 
     GPIO_PORTK_DIR_R = 0xFF;   //PK0-PK7: Saidas (Dados LCD)
     GPIO_PORTL_DIR_R = 0x00;   //PL0-PL3: Entradas (Linhas do teclado)
-    GPIO_PORTM_DIR_R = 0xF7;   //PM0-PM2: Saidas (Controle LCD); PM4-PM7: Saidas (Colunas)
+    GPIO_PORTM_DIR_R = 0x07;   //PM0-PM2: Saidas (Controle LCD); PM4-PM7: Entradas (Colunas em alta impedancia)
 
     GPIO_PORTK_AFSEL_R = 0x00; GPIO_PORTL_AFSEL_R = 0x00; GPIO_PORTM_AFSEL_R = 0x00;
 
