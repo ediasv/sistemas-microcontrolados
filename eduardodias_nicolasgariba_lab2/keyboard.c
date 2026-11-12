@@ -3,9 +3,8 @@
 
 //Prototipos externos que este arquivo precisa usar:
 void SysTick_Wait1ms(uint32_t delay);
-void SysTick_Wait1us(uint32_t delay);
 
-#define DEBOUNCE_MS 150   //Roteiro: atraso de 100-200ms apos identificar a tecla
+#define DEBOUNCE_MS 200   //Slide 25 d): debounce de 200ms a cada tecla pressionada
 
 //Mapeamento do teclado: teclado_map[PL][PM]
 //Na placa o conector do teclado esta invertido (pinos 1..8 = C4..C1, L4..L1):
@@ -20,39 +19,48 @@ const char teclado_map[4][4] = {
 };
 
 #define COLUNAS_MASK 0xF0 //PM4-PM7 (nunca mexer em PM0-PM2, usados pelo LCD)
-#define GUARDA_US    50   //Tempo de guarda apos trocar a coluna ativa
+#define GUARDA_MS    1    //Slide 25 c): tempo de guarda de 1ms ao trocar alta impedancia <-> saida
 
-//Volta PM4-PM7 para entrada (alta impedancia), sem alterar os demais bits.
+//Todas as colunas (PM4-PM7) como entrada = alta impedancia. Nao altera PM0-PM2.
 static void Colunas_AltaImpedancia(void) {
     GPIO_PORTM_DIR_R &= ~COLUNAS_MASK;
+    SysTick_Wait1ms(GUARDA_MS);                                            //tempo de guarda
 }
 
-//Varredura do teclado: ativa uma coluna por vez e le as linhas.
-//Coluna ativa = saida em nivel baixo; colunas inativas = entrada (alta impedancia).
-//Assim, duas teclas apertadas na mesma linha nunca ligam uma saida em 0 a uma saida em 1.
+//Varredura do teclado (slide 23):
+// - configurar a coluna como saida e as demais como entrada (alta impedancia);
+// - colocar 0 na coluna;
+// - ler as linhas: um bit em 0 indica a linha da tecla e a varredura termina;
+// - se todos os bits estiverem em 1, repetir para a proxima coluna.
 //Retorna o caractere da tecla pressionada ou 0 se nenhuma tecla.
 uint8_t Teclado_Read(void) {
     const uint32_t colunas[4] = {0x10, 0x20, 0x40, 0x80};   //PM4, PM5, PM6, PM7
 
     for (int c = 0; c < 4; c++) {
-        //Primeiro DIR, depois DATA: o TM4C ignora escritas em GPIODATA de pinos
-        //configurados como entrada, entao o 0 so e registrado com o pino ja saida.
-        GPIO_PORTM_DIR_R = (GPIO_PORTM_DIR_R & ~COLUNAS_MASK) | colunas[c];    //a) so ela como saida
-        GPIO_PORTM_DATA_R &= ~colunas[c];                                      //b) coluna ativa em 0
-        SysTick_Wait1us(GUARDA_US);                                            //c) tempo de guarda
+        //1) Esta coluna como saida e as demais como entrada (alta impedancia)
+        GPIO_PORTM_DIR_R = (GPIO_PORTM_DIR_R & ~COLUNAS_MASK) | colunas[c];
+        //2) Colocar 0 na coluna (depois do DIR: o TM4C ignora escritas em GPIODATA
+        //   de pinos configurados como entrada)
+        GPIO_PORTM_DATA_R &= ~colunas[c];
+        SysTick_Wait1ms(GUARDA_MS);                                        //tempo de guarda
 
-        uint32_t lines = GPIO_PORTL_DATA_R & 0x0F;                             //d) le PL0-PL3
+        //3) Verificar o valor de leitura das linhas
+        uint32_t lines = GPIO_PORTL_DATA_R & 0x0F;
 
-        if (lines != 0x0F) {
-            for (int l = 0; l < 4; l++) {
-                if (!(lines & (1 << l))) {
-                    SysTick_Wait1ms(DEBOUNCE_MS);                //Debounce
-                    while((GPIO_PORTL_DATA_R & 0x0F) != 0x0F);   //Trava ate soltar
-                    Colunas_AltaImpedancia();
-                    return teclado_map[l][c];
+        for (int l = 0; l < 4; l++) {
+            if (!(lines & (1 << l))) {
+                //4) Bit em 0: tecla na linha l. Trata o bounce (slide 19): espera o
+                //   debounce e so aceita a tecla se a linha continuar em 0.
+                SysTick_Wait1ms(DEBOUNCE_MS);
+                if (GPIO_PORTL_DATA_R & (1 << l)) {
+                    break;                                     //era ruido: segue a varredura
                 }
+                while((GPIO_PORTL_DATA_R & 0x0F) != 0x0F);     //Trava ate soltar
+                Colunas_AltaImpedancia();
+                return teclado_map[l][c];                      //varredura encerrada
             }
         }
+        //5) Todos os bits em 1: proxima coluna
     }
     Colunas_AltaImpedancia();
     return 0;
