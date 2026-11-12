@@ -35,8 +35,10 @@ uint8_t Teclado_Read(void) {
     const uint32_t colunas[4] = {0x10, 0x20, 0x40, 0x80};   //PM4, PM5, PM6, PM7
 
     for (int c = 0; c < 4; c++) {
-        GPIO_PORTM_DATA_R &= ~colunas[c];                                      //a) coluna ativa em 0
-        GPIO_PORTM_DIR_R = (GPIO_PORTM_DIR_R & ~COLUNAS_MASK) | colunas[c];    //b) so ela como saida
+        //Primeiro DIR, depois DATA: o TM4C ignora escritas em GPIODATA de pinos
+        //configurados como entrada, entao o 0 so e registrado com o pino ja saida.
+        GPIO_PORTM_DIR_R = (GPIO_PORTM_DIR_R & ~COLUNAS_MASK) | colunas[c];    //a) so ela como saida
+        GPIO_PORTM_DATA_R &= ~colunas[c];                                      //b) coluna ativa em 0
         SysTick_Wait1us(GUARDA_US);                                            //c) tempo de guarda
 
         uint32_t lines = GPIO_PORTL_DATA_R & 0x0F;                             //d) le PL0-PL3
