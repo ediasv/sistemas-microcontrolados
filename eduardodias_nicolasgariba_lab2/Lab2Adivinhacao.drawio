@@ -1,0 +1,108 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="DET - Jogo de Adivinhacao" id="det">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="&lt;b&gt;Lab 2 - Jogo de Adivinhacao (DET)&lt;/b&gt;&lt;br&gt;ISR Timer0A (1 ms): se contando, ms++; a cada 1000 ms, segundos++" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="300" y="10" width="560" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="init" value="" style="ellipse;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="90" y="175" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s_ag" value="&lt;b&gt;AGUARDANDO&lt;/b&gt;&lt;hr&gt;LCD: &quot;Adivinhe: 0-99&quot;&lt;br&gt;tempo parado" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="170" y="140" width="200" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s_dig" value="&lt;b&gt;DIGITANDO&lt;/b&gt;&lt;hr&gt;L1: &quot;Palpite: XX&quot;&lt;br&gt;L2: &quot;Tentativas: NN&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="560" y="140" width="200" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s_dica" value="&lt;b&gt;MOSTRANDO_DICA&lt;/b&gt;&lt;hr&gt;L1: &quot;Palpite: XX&quot;&lt;br&gt;L2: &quot;Dica: MAIOR/MENOR&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="560" y="440" width="200" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s_ac" value="&lt;b&gt;ACERTOU&lt;/b&gt;&lt;hr&gt;L1: &quot;ACERTOU! N=SS&quot;&lt;br&gt;L2: &quot;Tent:NN T:TTTs&quot;&lt;br&gt;tempo parado" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="900" y="290" width="200" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e0" value="reset / power-on" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;" edge="1" parent="1" source="init" target="s_ag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" value="qualquer tecla (exceto A)&lt;br&gt;secreto = GPTMTAR % 100&lt;br&gt;tentativas = 0; tempo = 0; inicia tempo&lt;br&gt;(se for digito, ja entra no palpite)" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;align=center;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_ag" target="s_dig">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e2" value="0-9 (se &amp;lt; 2 digitos): palpite = palpite*10 + d&lt;br&gt;* : palpite = 0" style="html=1;endArrow=block;curved=1;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_dig" target="s_dig">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="610" y="90" />
+              <mxPoint x="710" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e3" value="# (palpite != secreto)&lt;br&gt;tentativas++&lt;br&gt;dica = secreto &amp;gt; palpite ? MAIOR : MENOR" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_dig" target="s_dica">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="610" y="335" />
+              <mxPoint x="610" y="335" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e4" value="0-9 ou *&lt;br&gt;palpite = 0&lt;br&gt;(digito ja entra no novo palpite)" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_dica" target="s_dig">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="710" y="335" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e5" value="# (palpite == secreto)&lt;br&gt;tentativas++&lt;br&gt;para o tempo" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_dig" target="s_ac">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e6" value="A (a qualquer momento, de qualquer estado): nova partida" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;dashed=1;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_ac" target="s_ag">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1000" y="640" />
+              <mxPoint x="270" y="640" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e7" value="A" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;dashed=1;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_dica" target="s_ag">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="660" y="600" />
+              <mxPoint x="270" y="600" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e8" value="A" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;dashed=1;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_dig" target="s_ag">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="660" y="260" />
+              <mxPoint x="320" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e9" value="#, B, C, D: ignora" style="html=1;endArrow=block;curved=1;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="s_dica" target="s_dica">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="800" y="470" />
+              <mxPoint x="800" y="510" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
