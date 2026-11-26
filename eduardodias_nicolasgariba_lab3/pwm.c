@@ -1,8 +1,8 @@
 // pwm.c
 // Desenvolvido para a placa EK-TM4C1294XL
 // PWM por software com o Timer1A (modo periodico) e interrupcao
-// Saida em PE0 (sentido horario) ou PE1 (sentido anti-horario), entradas IN1/IN2 do L293
-// O enable do L293 (PF2) NAO e alterado aqui
+// Saida em PE0 ou PE1 (entradas IN1/IN2 do L293): o PWM vai em uma delas e a outra fica em 0
+// O enable do L293 (PF2) fica em 1 enquanto o PWM esta ativo e em 0 quando parado
 
 #include <stdint.h>
 
@@ -14,6 +14,12 @@
 
 #define PWM_PE0 0x01
 #define PWM_PE1 0x02
+#define PWM_EN_PF2 0x04 //enable do L293 (PF2)
+
+//Qual pino gira o motor em cada sentido. Depende da ligacao do motor: se o sentido
+//observado estiver trocado, basta inverter estas duas linhas
+#define PWM_PINO_HORARIO      PWM_PE0
+#define PWM_PINO_ANTIHORARIO  PWM_PE1
 
 //Variaveis compartilhadas entre o laco principal e a ISR
 static volatile uint8_t  pwm_ativo = 0;     //1 enquanto o Timer1A esta gerando pulsos
@@ -54,12 +60,23 @@ void PWM_Init(void)
 }
 
 // -------------------------------------------------------------------------------
+// Funcao PWM_Pino
+// Informa qual pino recebe o PWM em cada sentido
+// Parametro de entrada: sentido - 0 = horario, 1 = anti-horario
+// Parametro de saida: mascara do pino (0x01 = PE0, 0x02 = PE1)
+uint8_t PWM_Pino(uint8_t sentido)
+{
+	return (sentido == 0) ? PWM_PINO_HORARIO : PWM_PINO_ANTIHORARIO;
+}
+
+// -------------------------------------------------------------------------------
 // Funcao PWM_Parar
-// Comando de 0%: para o timer e deixa PE0 e PE1 em nivel baixo (sem nenhum pulso)
+// Comando de 0%: desabilita o L293 (PF2 = 0), para o timer e deixa PE0 e PE1 em nivel baixo
 // Parametro de entrada: Nao tem
 // Parametro de saida: Nao tem
 void PWM_Parar(void)
 {
+	GPIO_PORTF_AHB_DATA_BITS_R[PWM_EN_PF2] = 0; //1o: desabilita a ponte H (PF2 = 0)
 	pwm_ativo = 0;            //a ISR passa a ignorar qualquer interrupcao pendente
 	TIMER1_CTL_R &= ~0x01;    //desabilita o timer
 	TIMER1_ICR_R = 0x01;      //limpa o flag de interrupcao
@@ -70,7 +87,7 @@ void PWM_Parar(void)
 // -------------------------------------------------------------------------------
 // Funcao PWM_Definir
 // Define o sentido e o duty cycle do PWM
-// Parametro de entrada: sentido - 0 = horario (PE0), 1 = anti-horario (PE1)
+// Parametro de entrada: sentido - 0 = horario, 1 = anti-horario (pinos em PWM_PINO_*)
 //                       duty_permil - duty cycle em decimos de por cento (500 = 50%).
 //                       0 para o PWM; acima de 999 e limitado a 999 (99,9%)
 // Parametro de saida: Nao tem
@@ -86,7 +103,7 @@ void PWM_Definir(uint8_t sentido, uint16_t duty_permil)
 		duty_permil = PWM_DUTY_MAX;
 	}
 
-	uint8_t novo_pino = (sentido == 0) ? PWM_PE0 : PWM_PE1;
+	uint8_t novo_pino = PWM_Pino(sentido);
 	uint32_t alto = (uint32_t)duty_permil * PWM_TICKS_POR_MIL;
 
 	if(pwm_ativo && (novo_pino == pwm_pino))
@@ -105,6 +122,7 @@ void PWM_Definir(uint8_t sentido, uint16_t duty_permil)
 	TIMER1_TAILR_R = alto - 1;                         //1o intervalo: tempo ligado
 	pwm_ativo = 1;
 	TIMER1_CTL_R |= 0x01;                              //habilita o timer
+	GPIO_PORTF_AHB_DATA_BITS_R[PWM_EN_PF2] = PWM_EN_PF2; //habilita a ponte H (PF2 = 1)
 }
 
 // -------------------------------------------------------------------------------

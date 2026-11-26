@@ -12,6 +12,7 @@ void Timers_Init(void);
 void UART_Init(void);
 void PWM_Init(void);
 void PWM_Definir(uint8_t sentido, uint16_t duty_permil);
+uint8_t PWM_Pino(uint8_t sentido);
 void PWM_Medir(uint8_t pino);                         //TESTE-PWM
 void ADC_Init(void);
 uint16_t ADC_Leitura(void);
@@ -70,7 +71,7 @@ int main(void)
 					case 's': duty = 0;   break;  //0%: sem pulsos
 					case 'h': sentido = 0; break; //PE0
 					case 'a': sentido = 1; break; //PE1
-					case 'm': PWM_Medir(sentido == 0 ? 0x01 : 0x02); break; //mede e mostra no terminal
+					case 'm': PWM_Medir(PWM_Pino(sentido)); break; //mede e mostra no terminal
 					default: break;
 				}
 				PWM_Definir(sentido, duty);       //TESTE-PWM
