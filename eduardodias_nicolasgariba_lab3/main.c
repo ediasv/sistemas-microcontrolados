@@ -10,6 +10,8 @@ void SysTick_Init(void);
 void GPIO_Init(void);
 void Timers_Init(void);
 void UART_Init(void);
+void PWM_Init(void);
+void PWM_Definir(uint8_t sentido, uint16_t duty_permil);
 void ADC_Init(void);
 uint16_t ADC_Leitura(void);
 void UART_TxChar(char c);
@@ -33,10 +35,13 @@ int main(void)
 	Timers_Init();
 	UART_Init();
 	ADC_Init();
+	PWM_Init();
 
 	uint8_t iniciado = 0;   //1 depois de enviada a mensagem inicial
 	uint32_t segundos = 0;  //contador mostrado no terminal a cada segundo
 	char tecla;
+	uint8_t sentido = 0;     //TESTE-PWM: 0 = PE0, 1 = PE1
+	uint16_t duty = 0;       //TESTE-PWM: em decimos de por cento; 0 = parado
 
 	while (1) //laco principal
 	{
@@ -55,6 +60,19 @@ int main(void)
 			if (UART_RxChar(&tecla)) //nao bloqueia: so age se chegou um caractere
 			{
 				UART_TxChar(tecla); //por enquanto, devolve o caractere ao terminal (eco)
+
+				//TESTE-PWM: comandos provisorios para medir o PWM com analisador logico
+				switch (tecla)
+				{
+					case '5': duty = 500; break;  //50%
+					case '8': duty = 800; break;  //80%
+					case '0': duty = 999; break;  //99,9%
+					case 's': duty = 0;   break;  //0%: sem pulsos
+					case 'h': sentido = 0; break; //PE0
+					case 'a': sentido = 1; break; //PE1
+					default: break;
+				}
+				PWM_Definir(sentido, duty);       //TESTE-PWM
 			}
 
 			if (Timer_Evento100ms()) //a cada 100ms: le o potenciometro e mostra o codigo
