@@ -16,7 +16,7 @@
 #define UART_FBRD_9600 53
 
 //LCRH: WLEN = 8 bits (0x60), STP2 (0x08), PEN (0x02), EPS = 0 -> impar, FEN (0x10)
-#define UART_LCRH_8O2  0x7A
+#define UART_LCRH_8O2  0x70  //TESTE-BAUD: 8N1, voltar para 0x7A
 
 // -------------------------------------------------------------------------------
 // Funcao UART_Init

@@ -11,6 +11,8 @@ void GPIO_Init(void);
 void Timers_Init(void);
 void UART_Init(void);
 void UART_TxString(const char *s);
+void UART_TxChar(char c);              //TESTE-BAUD
+void SysTick_Wait1ms(uint32_t ms);     //TESTE-BAUD
 
 int main(void)
 {
@@ -24,5 +26,7 @@ int main(void)
 
 	while (1) //laco principal
 	{
+		UART_TxChar('U');       //TESTE-BAUD: remover
+		SysTick_Wait1ms(5);     //TESTE-BAUD: remover
 	}
 }
