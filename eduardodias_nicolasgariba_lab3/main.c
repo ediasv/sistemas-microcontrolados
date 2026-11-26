@@ -11,10 +11,8 @@ void GPIO_Init(void);
 void Timers_Init(void);
 void UART_Init(void);
 void PWM_Init(void);
-void PWM_Definir(uint8_t sentido, uint16_t duty_permil);
-uint8_t PWM_Pino(uint8_t sentido);
-void PWM_Medir(uint8_t pino);
-void PWM_TesteFixo(uint8_t sentido);                         //TESTE-PWM
+void Estados_Reinicia(void);
+void Estados_Tecla(char c);
 void ADC_Init(void);
 uint16_t ADC_Leitura(void);
 void UART_TxChar(char c);
@@ -42,8 +40,6 @@ int main(void)
 
 	uint8_t iniciado = 0;   //1 depois de enviada a mensagem inicial
 	char tecla;
-	uint8_t sentido = 0;     //TESTE-PWM: 0 = PE0, 1 = PE1
-	uint16_t duty = 0;       //TESTE-PWM: em decimos de por cento; 0 = parado
 
 	while (1) //laco principal
 	{
@@ -52,7 +48,7 @@ int main(void)
 			//Espera inicial sem bloquear: o laco continua girando
 			if (tempo_ms >= ESPERA_INICIAL_MS)
 			{
-				UART_TxString("Motor parado, pressione '*' para iniciar.\r\n");
+				Estados_Reinicia(); //motor parado e mensagem inicial
 				Timer_DescartaEventos(); //a contagem comeca a partir daqui
 				iniciado = 1;
 			}
@@ -61,23 +57,7 @@ int main(void)
 		{
 			if (UART_RxChar(&tecla)) //nao bloqueia: so age se chegou um caractere
 			{
-				UART_TxChar(tecla); //por enquanto, devolve o caractere ao terminal (eco)
-
-				//TESTE-PWM: comandos provisorios para medir o PWM com analisador logico
-				uint8_t aplicar = 1; //TESTE-PWM: 0 nas teclas que nao mudam o duty
-				switch (tecla)
-				{
-					case '5': duty = 500; break;  //50%
-					case '8': duty = 800; break;  //80%
-					case '0': duty = 999; break;  //99,9%
-					case 's': duty = 0;   break;  //0%: sem pulsos
-					case 'h': sentido = 0; break; //PE0
-					case 'a': sentido = 1; break; //PE1
-					case 'm': PWM_Medir(PWM_Pino(sentido)); aplicar = 0; break; //mede e mostra no terminal
-					case 'f': PWM_TesteFixo(sentido); duty = 0; aplicar = 0; break; //motor a 100% sem PWM
-					default: break;
-				}
-				if (aplicar) { PWM_Definir(sentido, duty); } //TESTE-PWM
+				Estados_Tecla(tecla); //a maquina de estados decide o que fazer
 			}
 
 		}

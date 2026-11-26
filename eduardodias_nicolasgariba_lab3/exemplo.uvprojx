@@ -431,6 +431,11 @@
               <FilePath>.\pwm.c</FilePath>
             </File>
             <File>
+              <FileName>estados.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\estados.c</FilePath>
+            </File>
+            <File>
               <FileName>teste_pwm.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\teste_pwm.c</FilePath>
