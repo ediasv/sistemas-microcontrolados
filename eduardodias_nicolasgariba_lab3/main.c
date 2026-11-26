@@ -12,6 +12,7 @@ void Timers_Init(void);
 void UART_Init(void);
 void PWM_Init(void);
 void PWM_Definir(uint8_t sentido, uint16_t duty_permil);
+void PWM_Medir(uint8_t pino);                         //TESTE-PWM
 void ADC_Init(void);
 uint16_t ADC_Leitura(void);
 void UART_TxChar(char c);
@@ -38,7 +39,6 @@ int main(void)
 	PWM_Init();
 
 	uint8_t iniciado = 0;   //1 depois de enviada a mensagem inicial
-	uint32_t segundos = 0;  //contador mostrado no terminal a cada segundo
 	char tecla;
 	uint8_t sentido = 0;     //TESTE-PWM: 0 = PE0, 1 = PE1
 	uint16_t duty = 0;       //TESTE-PWM: em decimos de por cento; 0 = parado
@@ -70,25 +70,12 @@ int main(void)
 					case 's': duty = 0;   break;  //0%: sem pulsos
 					case 'h': sentido = 0; break; //PE0
 					case 'a': sentido = 1; break; //PE1
+					case 'm': PWM_Medir(sentido == 0 ? 0x01 : 0x02); break; //mede e mostra no terminal
 					default: break;
 				}
 				PWM_Definir(sentido, duty);       //TESTE-PWM
 			}
 
-			if (Timer_Evento100ms()) //a cada 100ms: le o potenciometro e mostra o codigo
-			{
-				UART_TxString("ADC: ");
-				UART_TxUint(ADC_Leitura());
-				UART_TxString("\r\n");
-			}
-
-			if (Timer_Evento1s()) //a cada 1s
-			{
-				segundos++;
-				UART_TxString("Contador: ");
-				UART_TxUint(segundos);
-				UART_TxString("\r\n");
-			}
 		}
 	}
 }

@@ -430,6 +430,11 @@
               <FileType>1</FileType>
               <FilePath>.\pwm.c</FilePath>
             </File>
+            <File>
+              <FileName>teste_pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\teste_pwm.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
