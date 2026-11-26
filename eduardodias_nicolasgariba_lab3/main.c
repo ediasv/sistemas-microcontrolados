@@ -11,8 +11,7 @@ void GPIO_Init(void);
 void Timers_Init(void);
 void UART_Init(void);
 void UART_TxString(const char *s);
-void UART_TxChar(char c);              //TESTE-BAUD
-void SysTick_Wait1ms(uint32_t ms);     //TESTE-BAUD
+void SysTick_Wait1ms(uint32_t ms);
 
 int main(void)
 {
@@ -21,14 +20,13 @@ int main(void)
 	GPIO_Init();
 	Timers_Init();
 	UART_Init();
+
+	//Espera apos o reset antes da primeira mensagem; sem ela o terminal recebe lixo
 	SysTick_Wait1ms(2000);
 
 	UART_TxString("Motor parado, pressione '*' para iniciar.\r\n");
 
 	while (1) //laco principal
 	{
-		const char *t = "Motor parado, pressione '*' para iniciar.\r\n"; //TESTE-BAUD: remover
-		while (*t) { UART_TxChar(*t++); SysTick_Wait1ms(5); }               //TESTE-BAUD: 5ms entre caracteres
-		SysTick_Wait1ms(500);   //TESTE-BAUD: remover
 	}
 }
