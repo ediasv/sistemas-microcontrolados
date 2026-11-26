@@ -13,7 +13,8 @@ void UART_Init(void);
 void PWM_Init(void);
 void PWM_Definir(uint8_t sentido, uint16_t duty_permil);
 uint8_t PWM_Pino(uint8_t sentido);
-void PWM_Medir(uint8_t pino);                         //TESTE-PWM
+void PWM_Medir(uint8_t pino);
+void PWM_TesteFixo(uint8_t sentido);                         //TESTE-PWM
 void ADC_Init(void);
 uint16_t ADC_Leitura(void);
 void UART_TxChar(char c);
@@ -63,6 +64,7 @@ int main(void)
 				UART_TxChar(tecla); //por enquanto, devolve o caractere ao terminal (eco)
 
 				//TESTE-PWM: comandos provisorios para medir o PWM com analisador logico
+				uint8_t aplicar = 1; //TESTE-PWM: 0 nas teclas que nao mudam o duty
 				switch (tecla)
 				{
 					case '5': duty = 500; break;  //50%
@@ -71,10 +73,11 @@ int main(void)
 					case 's': duty = 0;   break;  //0%: sem pulsos
 					case 'h': sentido = 0; break; //PE0
 					case 'a': sentido = 1; break; //PE1
-					case 'm': PWM_Medir(PWM_Pino(sentido)); break; //mede e mostra no terminal
+					case 'm': PWM_Medir(PWM_Pino(sentido)); aplicar = 0; break; //mede e mostra no terminal
+					case 'f': PWM_TesteFixo(sentido); duty = 0; aplicar = 0; break; //motor a 100% sem PWM
 					default: break;
 				}
-				PWM_Definir(sentido, duty);       //TESTE-PWM
+				if (aplicar) { PWM_Definir(sentido, duty); } //TESTE-PWM
 			}
 
 		}

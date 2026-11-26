@@ -13,6 +13,8 @@
 
 void UART_TxString(const char *s);
 void UART_TxUint(uint32_t n);
+void PWM_Parar(void);
+uint8_t PWM_Pino(uint8_t sentido);
 
 #define TICKS_POR_US      80
 #define PERIODO_ESPERADO  80000   //1ms, o mesmo de pwm.c
@@ -114,4 +116,18 @@ void PWM_Medir(uint8_t pino)
 	UART_TxString("Periodos medidos: "); UART_TxUint(validos);
 	UART_TxString(", descartados: "); UART_TxUint(descartados);
 	UART_TxString("\r\n");
+}
+
+// -------------------------------------------------------------------------------
+// Funcao PWM_TesteFixo
+// Liga o motor a 100%, SEM PWM: nivel alto fixo no pino do sentido e PF2 = 1.
+// Serve para separar problema de PWM de problema de ligacao/alimentacao do motor.
+// Parar com PWM_Parar() (tecla 's')
+// Parametro de entrada: sentido - 0 = horario, 1 = anti-horario
+// Parametro de saida: Nao tem
+void PWM_TesteFixo(uint8_t sentido)
+{
+	PWM_Parar();
+	GPIO_PORTE_AHB_DATA_BITS_R[PWM_Pino(sentido)] = PWM_Pino(sentido);
+	GPIO_PORTF_AHB_DATA_BITS_R[0x04] = 0x04;
 }
