@@ -13,6 +13,8 @@ void UART_Init(void);
 void PWM_Init(void);
 void Estados_Reinicia(void);
 void Estados_Tecla(char c);
+void Estados_Evento100ms(void);
+void Estados_Evento1s(void);
 void ADC_Init(void);
 uint16_t ADC_Leitura(void);
 void UART_TxChar(char c);
@@ -60,6 +62,15 @@ int main(void)
 				Estados_Tecla(tecla); //a maquina de estados decide o que fazer
 			}
 
+			if (Timer_Evento100ms()) //a cada 100ms: atualiza o alvo do potenciometro
+			{
+				Estados_Evento100ms();
+			}
+
+			if (Timer_Evento1s()) //a cada 1s: mostra o alvo (modo potenciometro)
+			{
+				Estados_Evento1s();
+			}
 		}
 	}
 }
