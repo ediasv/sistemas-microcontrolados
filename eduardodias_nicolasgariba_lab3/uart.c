@@ -90,3 +90,25 @@ uint8_t UART_RxChar(char *c)
 	*c = (char)(UART0_DR_R & 0xFF); //bits 7:0 = dado; bits 11:8 = flags de erro
 	return 1;
 }
+
+// -------------------------------------------------------------------------------
+// Funcao UART_TxUint
+// Envia um numero inteiro sem sinal em decimal (sem usar printf)
+// Parametro de entrada: n - numero a enviar
+// Parametro de saida: Nao tem
+void UART_TxUint(uint32_t n)
+{
+	char digitos[10]; //uint32_t tem no maximo 10 digitos decimais
+	uint8_t i = 0;
+
+	do
+	{
+		digitos[i++] = (char)('0' + (n % 10)); //digitos saem do menos significativo
+		n /= 10;
+	} while(n > 0);
+
+	while(i > 0)
+	{
+		UART_TxChar(digitos[--i]); //envia do mais significativo para o menos
+	}
+}
