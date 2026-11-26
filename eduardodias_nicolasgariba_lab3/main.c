@@ -9,6 +9,8 @@ void PLL_Init(void);
 void SysTick_Init(void);
 void GPIO_Init(void);
 void Timers_Init(void);
+void UART_Init(void);
+void UART_TxString(const char *s);
 
 int main(void)
 {
@@ -16,6 +18,9 @@ int main(void)
 	SysTick_Init();
 	GPIO_Init();
 	Timers_Init();
+	UART_Init();
+
+	UART_TxString("Motor parado, pressione '*' para iniciar.\r\n");
 
 	while (1) //laco principal
 	{
