@@ -26,7 +26,7 @@ int main(void)
 
 	while (1) //laco principal
 	{
-		UART_TxChar('U');       //TESTE-BAUD: remover
-		SysTick_Wait1ms(5);     //TESTE-BAUD: remover
+		UART_TxString("Motor parado, pressione '*' para iniciar.\r\n"); //TESTE-BAUD: remover
+		SysTick_Wait1ms(500);   //TESTE-BAUD: remover
 	}
 }
