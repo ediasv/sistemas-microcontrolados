@@ -21,6 +21,7 @@ int main(void)
 	GPIO_Init();
 	Timers_Init();
 	UART_Init();
+	SysTick_Wait1ms(2000);
 
 	UART_TxString("Motor parado, pressione '*' para iniciar.\r\n");
 
