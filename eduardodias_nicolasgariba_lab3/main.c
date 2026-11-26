@@ -11,6 +11,8 @@ void GPIO_Init(void);
 void Timers_Init(void);
 void UART_Init(void);
 void UART_TxString(const char *s);
+uint8_t UART_RxChar(char *c);
+void UART_TxChar(char c);
 void SysTick_Wait1ms(uint32_t ms);
 
 int main(void)
@@ -26,7 +28,13 @@ int main(void)
 
 	UART_TxString("Motor parado, pressione '*' para iniciar.\r\n");
 
+	char tecla;
+
 	while (1) //laco principal
 	{
+		if (UART_RxChar(&tecla)) //nao bloqueia: so age se chegou um caractere
+		{
+			UART_TxChar(tecla); //por enquanto, devolve o caractere ao terminal (eco)
+		}
 	}
 }

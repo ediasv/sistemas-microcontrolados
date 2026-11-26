@@ -75,3 +75,18 @@ void UART_TxString(const char *s)
 		UART_TxChar(*s++);
 	}
 }
+
+// -------------------------------------------------------------------------------
+// Funcao UART_RxChar
+// Le um caractere se houver algum na FIFO de recepcao, sem esperar (nao bloqueia)
+// Parametro de entrada: c - ponteiro onde o caractere lido e guardado
+// Parametro de saida: 1 se um caractere foi lido, 0 se a FIFO esta vazia
+uint8_t UART_RxChar(char *c)
+{
+	if((UART0_FR_R & UART_FR_RXFE) != 0) //RXFE = 1: FIFO vazia
+	{
+		return 0;
+	}
+	*c = (char)(UART0_DR_R & 0xFF); //bits 7:0 = dado; bits 11:8 = flags de erro
+	return 1;
+}
