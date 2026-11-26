@@ -10,6 +10,8 @@ void SysTick_Init(void);
 void GPIO_Init(void);
 void Timers_Init(void);
 void UART_Init(void);
+void ADC_Init(void);
+uint16_t ADC_Leitura(void);
 void UART_TxChar(char c);
 void UART_TxString(const char *s);
 void UART_TxUint(uint32_t n);
@@ -30,6 +32,7 @@ int main(void)
 	GPIO_Init();
 	Timers_Init();
 	UART_Init();
+	ADC_Init();
 
 	uint8_t iniciado = 0;   //1 depois de enviada a mensagem inicial
 	uint32_t segundos = 0;  //contador mostrado no terminal a cada segundo
@@ -52,6 +55,13 @@ int main(void)
 			if (UART_RxChar(&tecla)) //nao bloqueia: so age se chegou um caractere
 			{
 				UART_TxChar(tecla); //por enquanto, devolve o caractere ao terminal (eco)
+			}
+
+			if (Timer_Evento100ms()) //a cada 100ms: le o potenciometro e mostra o codigo
+			{
+				UART_TxString("ADC: ");
+				UART_TxUint(ADC_Leitura());
+				UART_TxString("\r\n");
 			}
 
 			if (Timer_Evento1s()) //a cada 1s
